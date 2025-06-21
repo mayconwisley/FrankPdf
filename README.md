@@ -35,6 +35,10 @@ Você pode baixar o executável compilado clicando no link abaixo:
 > ```bash
 > FrankPdf.exe "C:\Caminho\dos\Arquivos"
 > ```
+>Opcional 
+> ```bash
+> FrankPdf.exe "C:\Caminho\dos\Arquivos\de\Entrada" "C:\Caminho\dos\Arquivos\de\Saida"
+> ```
 
 ## 🚀 Como Usar
 
