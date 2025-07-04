@@ -28,7 +28,7 @@ FrankPDF (de Frankenstein — junta partes diferentes)
 
 Você pode baixar o executável compilado clicando no link abaixo:
 
-👉 [Download do FranlPdf](https://github.com/mayconwisley/FrankPdf/raw/refs/heads/master/Download/FrankPdf.exe)
+👉 [Download do FrankPdf](https://github.com/mayconwisley/FrankPdf/raw/refs/heads/master/Download/FrankPdf.exe)
 
 > Após o download, você pode executá-lo via terminal:
 >
