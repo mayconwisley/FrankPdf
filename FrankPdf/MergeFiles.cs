@@ -12,7 +12,7 @@ public static class MergeFiles
     public static void Merge(string inputFile, string outputFile)
     {
         var inputFiles = Directory.GetFiles(inputFile, "*.*", SearchOption.TopDirectoryOnly);
-        inputFiles.OrderBy(o => o);
+        inputFiles.OrderBy(static o => o);
 
         if (inputFiles == null || inputFiles.Length == 0)
             throw new ArgumentException("Nenhum arquivo de entrada fornecido para mesclagem.");
@@ -22,44 +22,36 @@ public static class MergeFiles
 
         try
         {
-            using (PdfDocument outputDocument = new PdfDocument())
+            using PdfDocument outputDocument = new();
+            foreach (string file in inputFiles)
             {
-                foreach (string file in inputFiles)
+                if (string.IsNullOrEmpty(file))
+                    throw new ArgumentException("Um dos arquivos de entrada é nulo ou vazio.");
+
+                var extension = Path.GetExtension(file)?.ToLowerInvariant();
+                if (extension == ".pdf")
                 {
-                    if (string.IsNullOrEmpty(file))
-                        throw new ArgumentException("Um dos arquivos de entrada é nulo ou vazio.");
-
-                    var extension = Path.GetExtension(file)?.ToLowerInvariant();
-                    if (extension == ".pdf")
+                    //Abrir arquivo PDF existente
+                    using PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import);
+                    for (int i = 0; i < inputDocument.PageCount; i++)
                     {
-                        //Abrir arquivo PDF existente
-                        using (PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import))
-                        {
-                            for (int i = 0; i < inputDocument.PageCount; i++)
-                            {
-                                var page = inputDocument.Pages[i];
-                                outputDocument.AddPage(page);
-                            }
-                        }
+                        var page = inputDocument.Pages[i];
+                        outputDocument.AddPage(page);
                     }
-                    else if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".bmp")
-                    {
-                        //Adicionar imagem ao PDF
-                        var page = outputDocument.AddPage();
-
-                        using (var image = XImage.FromFile(file))
-                        {
-                            using (var gfx = XGraphics.FromPdfPage(page))
-                            {
-                                // Desenha a imagem no PDF
-                                gfx.DrawImage(image, 0, 0, page.Width.Point, page.Height.Point);
-                            }
-                        }
-                    }
-                    DeleteFiles.Delete(file);
                 }
-                outputDocument.Save(outputFile);
+                else if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".bmp")
+                {
+                    //Adicionar imagem ao PDF
+                    var page = outputDocument.AddPage();
+
+                    using var image = XImage.FromFile(file);
+                    using var gfx = XGraphics.FromPdfPage(page);
+                    // Desenha a imagem no PDF
+                    gfx.DrawImage(image, 0, 0, page.Width.Point, page.Height.Point);
+                }
+                DeleteFiles.Delete(file);
             }
+            outputDocument.Save(outputFile);
         }
         catch (Exception ex)
         {
