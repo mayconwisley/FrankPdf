@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FrankPdf": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Temp\\FrankPdf C:\\Temp\\FrankPdfOutput"
+    }
+  }
+}

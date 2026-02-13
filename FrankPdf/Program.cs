@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace FrankPdf;
 
@@ -7,30 +8,47 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        if (args.Length == 0)
-            throw new ArgumentException("Nenhum argumento fornecido. Por favor, forneça o caminho do diretório de entrada e/ou nome do arquivo de saída.");
-
-        var name = $"{DateTime.Now:yyyy-MM-dd}_{Guid.NewGuid():N}.pdf";
-
-        if (args.Length == 1)
+        if (args.Length < 1 || args.Length > 3)
         {
-            // Se apenas um argumento for fornecido, assume-se que é o diretório de entrada
-            var inputDirectory = args[0];
-            var outputFile = Path.Combine(inputDirectory, name);
+            Console.WriteLine("Uso:");
+            Console.WriteLine("FrankPdf <input_directory> [output_directory] [--delete-input]");
+            return;
+        }
 
-            MergeFiles.Merge(inputDirectory, outputFile);
-        }
-        else if (args.Length == 2)
+        string inputDirectory = args[0];
+
+        if (!Directory.Exists(inputDirectory))
+            throw new DirectoryNotFoundException($"Diretório não encontrado: {inputDirectory}");
+
+        string outputDirectory = inputDirectory;
+        bool isDeleteFile = false;
+
+        foreach (var arg in args.Skip(1))
         {
-            // Se dois argumentos forem fornecidos, assume-se que o primeiro é o diretório de entrada e o segundo é o nome do arquivo de saída
-            var inputDirectory = args[0];
-            var outputFileName = args[1];
-            var outputFile = Path.Combine(outputFileName, name);
-            MergeFiles.Merge(inputDirectory, outputFile);
+            if (arg.Equals("--delete-input", StringComparison.OrdinalIgnoreCase))
+                isDeleteFile = true;
+            else
+                outputDirectory = arg;
         }
-        else
+
+        if (!Directory.Exists(outputDirectory))
+            throw new DirectoryNotFoundException($"Diretório de saída não encontrado: {outputDirectory}");
+
+        if (isDeleteFile &&
+            string.Equals(inputDirectory, outputDirectory, StringComparison.OrdinalIgnoreCase))
         {
-            throw new ArgumentException("Número inválido de argumentos. Use: FrankPdf <input_directory> [output_file_name]");
+            throw new InvalidOperationException(
+                "Para usar --delete-input o diretório de saída deve ser diferente do diretório de entrada.");
         }
+
+        string outputFile = Path.Combine(outputDirectory, "pdfMerge.pdf");
+
+        MergeFiles.Merge(
+            inputDirectory,
+            outputFile,
+            isDeleteFile
+        );
+
+        Console.WriteLine("Processo concluído com sucesso.");
     }
 }
