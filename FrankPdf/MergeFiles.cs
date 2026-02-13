@@ -10,7 +10,7 @@ namespace FrankPdf;
 
 public static class MergeFiles
 {
-    public static void Merge(string inputDirectory, string outputFile, bool isDeleteFile)
+    public static void Merge(string inputDirectory, string outputFile)
     {
         var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -55,10 +55,6 @@ public static class MergeFiles
                 }
             }
             outputDocument.Save(outputFile);
-
-            if (isDeleteFile)
-                foreach (var file in inputFiles)
-                    File.Delete(file);
         }
         catch (Exception ex)
         {
